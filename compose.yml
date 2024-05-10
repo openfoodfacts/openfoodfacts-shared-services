@@ -4,6 +4,8 @@ services:
     command: redis-server --save 60 1 --loglevel warning
     volumes:
       - redisdata:/data
+    networks:
+      - shared_network
 
   mongodb:
     image: mongo:4.4
@@ -13,9 +15,14 @@ services:
       - import:/import
     ports:
       - "127.0.0.1:${MONGO_EXPOSE_PORT:-27017}:27017"
+    networks:
+      - shared_network
 
 volumes:
   redisdata:
   dbdata:
   import:
   
+networks:
+  shared_network:
+    name: shared_network
