@@ -1,0 +1,21 @@
+services:
+  redis:
+    image: redis:7.2-alpine
+    command: redis-server --save 60 1 --loglevel warning
+    volumes:
+      - redisdata:/data
+
+  mongodb:
+    image: mongo:4.4
+    command: mongod --wiredTigerCacheSizeGB ${MONGODB_CACHE_SIZE}
+    volumes:
+      - dbdata:/data/db
+      - import:/import
+    ports:
+      - "127.0.0.1:${MONGO_EXPOSE_PORT:-27017}:27017"
+
+volumes:
+  redisdata:
+  dbdata:
+  import:
+  
