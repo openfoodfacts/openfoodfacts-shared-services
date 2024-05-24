@@ -7,15 +7,13 @@ services:
 
   mongodb:
     volumes:
-      - dbdata:/data/db
-      - import:/import
+      - ${MONGODB_DATA_DIR}:/data/db
+      - ./import:/import
     networks:
       - shared_network
 
 volumes:
   redisdata:
-  dbdata:
-  import:
   
 networks:
   shared_network:

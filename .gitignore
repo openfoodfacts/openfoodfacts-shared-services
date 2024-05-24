@@ -1,0 +1,5 @@
+# Directory used for staging imports
+/import
+
+# Default mongodb data folder
+/dbdata
