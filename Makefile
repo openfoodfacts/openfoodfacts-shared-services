@@ -1,6 +1,7 @@
 include .env
 
-DOCKER_COMPOSE_RUN=docker compose -p off_shared -f docker-compose.yml -f docker-compose-run.yml
+# Need to override here so we don't pick up values set up off-server
+override DOCKER_COMPOSE_RUN=docker compose -p off_shared -f docker-compose.yml -f docker-compose-run.yml
 
 run:
 # Make sure the import and dbadata directories are owned by the host, not docker
@@ -24,6 +25,6 @@ import_prod_data: run
 	wget --no-verbose https://static.openfoodfacts.org/data/gz-sha256sum -P ./import
 	cd ./import && sha256sum --check gz-sha256sum
 	@echo "🥫 Restoring the MongoDB dump …"
-	${DOCKER_COMPOSE_RUN} exec -T mongodb sh -c "cd /data/db && mongorestore --quiet --drop --gzip --archive=/import/openfoodfacts-mongodbdump.gz"
-	rm .import/openfoodfacts-mongodbdump.gz && rm .import/gz-sha256sum
+	${DOCKER_COMPOSE_RUN} exec -T mongodb sh -c "cd /data/db && mongorestore --drop --gzip --archive=/import/openfoodfacts-mongodbdump.gz"
+	@rm ./import/openfoodfacts-mongodbdump.gz && rm ./import/gz-sha256sum
 
