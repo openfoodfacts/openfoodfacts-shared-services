@@ -1,3 +1,4 @@
+# Used when running locally for ad-hoc testing
 services:
   redis:
     volumes:

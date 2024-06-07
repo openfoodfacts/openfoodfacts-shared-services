@@ -1,3 +1,4 @@
+# This compose file is imported by PO for tests so intentionally has no volume or network definitions
 services:
   redis:
     image: redis:7.2-alpine
@@ -7,4 +8,4 @@ services:
     image: mongo:4.4
     command: mongod --wiredTigerCacheSizeGB ${MONGODB_CACHE_SIZE}
     ports:
-      - "127.0.0.1:${MONGO_EXPOSE_PORT:-27017}:27017"
+      - "${MONGO_EXPOSE_PORT:-27017}:27017"

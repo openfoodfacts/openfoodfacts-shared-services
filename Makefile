@@ -28,3 +28,10 @@ import_prod_data: run
 	${DOCKER_COMPOSE_RUN} exec -T mongodb sh -c "cd /data/db && mongorestore --drop --gzip --archive=/import/openfoodfacts-mongodbdump.gz"
 	@rm ./import/openfoodfacts-mongodbdump.gz && rm ./import/gz-sha256sum
 
+livecheck:
+	@echo "🥫 Running livecheck …"
+	docker/docker-livecheck.sh
+
+prune:
+	@echo "🥫 Pruning unused Docker artifacts (save space) …"
+	docker system prune -af

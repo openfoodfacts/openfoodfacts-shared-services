@@ -1,0 +1,43 @@
+services:
+  redis:
+    restart: always
+    volumes:
+      - redisdata:/data
+    networks:
+      - webnet
+
+  mongodb:
+    restart: always
+    volumes:
+      - dbdata:/data/db
+      # import volume, currently pointing to previous location
+      # Will need to fix this if we automatically deploy to production
+      - ../../off-net/html/data:/import
+    networks:
+      - db
+
+  mongodb_exporter:
+    image: bitnami/mongodb-exporter:0
+    command: --discovering-mode --mongodb.uri=mongodb://mongodb:27017/admin?ssl=true
+    ports:
+      - 9216:9216
+    networks:
+      - db
+
+# Note that volumes and networks are currently hard-prefixed with po_
+# to keep compatibility with previous deployment via off-server
+volumes:
+  redisdata:
+    external: true
+    name: po_redisdata
+
+  dbdata:
+    external: true
+
+networks:
+  db:
+    name: po_db
+
+  webnet:
+    external: true
+    name: po_webnet
