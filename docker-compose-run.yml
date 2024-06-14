@@ -4,18 +4,19 @@ services:
     volumes:
       - redisdata:/data
     networks:
-      - shared_network
+      - common_net
 
   mongodb:
     volumes:
       - ${MONGODB_DATA_DIR}:/data/db
       - ./import:/import
     networks:
-      - shared_network
+      - common_net
 
 volumes:
   redisdata:
   
 networks:
-  shared_network:
-    name: shared_network
+  common_net:
+    external: true
+    name: ${COMMON_NET_NAME}

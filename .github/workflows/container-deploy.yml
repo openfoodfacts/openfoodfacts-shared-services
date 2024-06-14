@@ -32,6 +32,7 @@ jobs:
         echo "SSH_HOST=10.1.0.200" >> $GITHUB_ENV
         echo "SSH_PROXY_HOST=ovh1.openfoodfacts.org" >> $GITHUB_ENV
         echo "SSH_USERNAME=off" >> $GITHUB_ENV
+        echo "COMMON_NET_NAME=po_webnet" >> $GITHUB_ENV
 
     - name: Set various variable for prod (org) deployment
       if: matrix.env == 'shared-org'
@@ -84,6 +85,7 @@ jobs:
 
           # Use old po project name for now so we don't disrupt the current deployment
           echo "SHARED_PROJECT_NAME=po" >> .env
+          echo "COMMON_NET_NAME=${{ env.COMMON_NET_NAME }}" >> .env
 
           echo "COMPOSE_PATH_SEPARATOR=;" >> .env
           echo "SHARED_COMPOSE_FILE=docker-compose.yml;docker/prod.yml" >> .env
@@ -110,8 +112,6 @@ jobs:
           || echo "dbdata volume already exists"
           docker volume create --driver=local -o type=none -o o=bind -o device=/srv/off/docker_data/redis po_redisdata
           || echo "redisdata volume already exists"
-          docker network create --driver=bridge --subnet="172.30.0.0/16" po_webnet \
-          || echo "webnet network already exists"      
 
     - name: Start services
       uses: appleboy/ssh-action@master

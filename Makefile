@@ -1,13 +1,11 @@
 include .env
 
-# Need to override here so we don't pick up values set up off-server
-override COMPOSE_FILE=${SHARED_COMPOSE_FILE}
-override COMPOSE_PROJECT_NAME=${SHARED_PROJECT_NAME}
-override DOCKER_COMPOSE=docker compose
-
 export
 
-run:
+# Need to override here so we don't pick up values set up off-server
+override DOCKER_COMPOSE=COMPOSE_FILE="${SHARED_COMPOSE_FILE}" COMPOSE_PROJECT_NAME=${SHARED_PROJECT_NAME} docker compose
+
+run: create_external_networks
 # Make sure the import and dbadata directories are owned by the host, not docker
 	@mkdir -p ./import
 	@mkdir -p ${MONGODB_DATA_DIR}
@@ -43,3 +41,6 @@ livecheck:
 prune:
 	@echo "🥫 Pruning unused Docker artifacts (save space) …"
 	docker system prune -af
+
+create_external_networks:
+	docker network create ${COMMON_NET_NAME} || true

@@ -4,7 +4,7 @@ services:
     volumes:
       - redisdata:/data
     networks:
-      - webnet
+      - common_net
 
   mongodb:
     restart: always
@@ -13,7 +13,7 @@ services:
       - dbdata:/data/db
       - ./import:/import
     networks:
-      - db
+      - common_net
 
   mongodb_exporter:
     image: bitnami/mongodb-exporter:0
@@ -21,7 +21,7 @@ services:
     ports:
       - 9216:9216
     networks:
-      - db
+      - common_net
 
 volumes:
   redisdata:
@@ -32,9 +32,6 @@ volumes:
     external: true
 
 networks:
-  db:
-    name: ${COMPOSE_PROJECT_NAME}_db
-
-  webnet:
+  common_net:
     external: true
-    name: ${COMPOSE_PROJECT_NAME}_webnet
+    name: ${COMMON_NET_NAME}
