@@ -83,11 +83,13 @@ jobs:
           echo "COMPOSE_HTTP_TIMEOUT=360" >> .env
 
           # Use old po project name for now so we don't disrupt the current deployment
-          echo "COMPOSE_PROJECT_NAME=po" >> .env
+          echo "SHARED_PROJECT_NAME=po" >> .env
 
           echo "COMPOSE_PATH_SEPARATOR=;" >> .env
-          echo "COMPOSE_FILE=docker-compose.yml;docker/prod.yml" >> .env
+          echo "SHARED_COMPOSE_FILE=docker-compose.yml;docker/prod.yml" >> .env
 
+          # Use dbdata docker volume for now to keep consistency with previous po owned deployment
+          echo "MONGODB_DATA_DIR=dbdata" >> .env
           # Set App variables
           echo "MONGODB_CACHE_SIZE=${{ env.MONGODB_CACHE_SIZE }}" >> .env
           echo "MONGODB_HOST=${{ env.MONGODB_HOST }}" >> .env
@@ -124,7 +126,7 @@ jobs:
         script_stop: false
         script: |
           cd ${{ matrix.env }}
-          docker compose up
+          make run
 
     - name: Check services are up
       uses: appleboy/ssh-action@master

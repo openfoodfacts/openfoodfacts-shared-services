@@ -9,10 +9,9 @@ services:
   mongodb:
     restart: always
     volumes:
+      # Use dbdata docker volume for now to keep consistency with previous po owned deployment
       - dbdata:/data/db
-      # import volume, currently pointing to previous location
-      # Will need to fix this if we automatically deploy to production
-      - ../../off-net/html/data:/import
+      - ./import:/import
     networks:
       - db
 
