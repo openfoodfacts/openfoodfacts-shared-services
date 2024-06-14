@@ -24,20 +24,18 @@ services:
     networks:
       - db
 
-# Note that volumes and networks are currently hard-prefixed with po_
-# to keep compatibility with previous deployment via off-server
 volumes:
   redisdata:
     external: true
-    name: po_redisdata
+    name: ${COMPOSE_PROJECT_NAME}_redisdata
 
   dbdata:
     external: true
 
 networks:
   db:
-    name: po_db
+    name: ${COMPOSE_PROJECT_NAME}_db
 
   webnet:
     external: true
-    name: po_webnet
+    name: ${COMPOSE_PROJECT_NAME}_webnet
