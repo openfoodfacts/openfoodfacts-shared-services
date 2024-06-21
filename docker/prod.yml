@@ -30,6 +30,7 @@ volumes:
 
   dbdata:
     external: true
+    name: ${MONGODB_DATA_VOLUME}
 
 networks:
   common_net:

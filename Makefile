@@ -1,4 +1,5 @@
 include .env
+-include .envrc
 
 export
 
@@ -8,7 +9,6 @@ override DOCKER_COMPOSE=COMPOSE_FILE="${SHARED_COMPOSE_FILE}" COMPOSE_PROJECT_NA
 run: create_external_networks
 # Make sure the import and dbadata directories are owned by the host, not docker
 	@mkdir -p ./import
-	@mkdir -p ${MONGODB_DATA_DIR}
 	${DOCKER_COMPOSE} up -d
 
 import_prod_data: run

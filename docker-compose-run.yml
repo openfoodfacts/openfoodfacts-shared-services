@@ -8,12 +8,13 @@ services:
 
   mongodb:
     volumes:
-      - ${MONGODB_DATA_DIR}:/data/db
+      - dbdata:/data/db
       - ./import:/import
     networks:
       - common_net
 
 volumes:
+  dbdata:
   redisdata:
   
 networks:
