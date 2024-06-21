@@ -95,6 +95,7 @@ jobs:
           # Set App variables
           echo "MONGODB_CACHE_SIZE=${{ env.MONGODB_CACHE_SIZE }}" >> .env
           echo "MONGODB_HOST=${{ env.MONGODB_HOST }}" >> .env
+          echo "MONGODB_EXPOSE=27017" >> .env
 
     - name: Create Docker volumes and networks
       uses: appleboy/ssh-action@master
