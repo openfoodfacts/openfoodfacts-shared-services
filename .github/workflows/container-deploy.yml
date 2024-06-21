@@ -110,7 +110,7 @@ jobs:
         script: |
           docker volume create dbdata \
           || echo "dbdata volume already exists"
-          docker volume create --driver=local -o type=none -o o=bind -o device=/srv/off/docker_data/redis po_redisdata
+          docker volume create --driver=local -o type=none -o o=bind -o device=/srv/off/docker_data/redis po_redisdata \
           || echo "redisdata volume already exists"
 
     - name: Start services
