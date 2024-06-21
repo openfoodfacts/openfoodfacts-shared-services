@@ -1,13 +1,15 @@
 include .env
+-include .envrc
+
+export
 
 # Need to override here so we don't pick up values set up off-server
-override DOCKER_COMPOSE_RUN=docker compose -p off_shared -f docker-compose.yml -f docker-compose-run.yml
+override DOCKER_COMPOSE=COMPOSE_FILE="${SHARED_COMPOSE_FILE}" COMPOSE_PROJECT_NAME=${SHARED_PROJECT_NAME} docker compose
 
-run:
+run: create_external_networks
 # Make sure the import and dbadata directories are owned by the host, not docker
 	@mkdir -p ./import
-	@mkdir -p ${MONGODB_DATA_DIR}
-	${DOCKER_COMPOSE_RUN} up -d
+	${DOCKER_COMPOSE} up -d
 
 import_prod_data: run
 	@echo "🥫 Importing production data (~2M products) into MongoDB …"
@@ -25,6 +27,20 @@ import_prod_data: run
 	wget --no-verbose https://static.openfoodfacts.org/data/gz-sha256sum -P ./import
 	cd ./import && sha256sum --check gz-sha256sum
 	@echo "🥫 Restoring the MongoDB dump …"
-	${DOCKER_COMPOSE_RUN} exec -T mongodb sh -c "cd /data/db && mongorestore --drop --gzip --archive=/import/openfoodfacts-mongodbdump.gz"
+	${DOCKER_COMPOSE} exec -T mongodb sh -c "cd /data/db && mongorestore --drop --gzip --archive=/import/openfoodfacts-mongodbdump.gz"
 	@rm ./import/openfoodfacts-mongodbdump.gz && rm ./import/gz-sha256sum
 
+restart_db:
+	@echo "🥫 Restarting MongoDB database …"
+	${DOCKER_COMPOSE} restart mongodb
+
+livecheck:
+	@echo "🥫 Running livecheck …"
+	docker/docker-livecheck.sh
+
+prune:
+	@echo "🥫 Pruning unused Docker artifacts (save space) …"
+	docker system prune -af
+
+create_external_networks:
+	docker network create ${COMMON_NET_NAME} || true

@@ -1,3 +1,4 @@
+# This compose file is imported by PO for tests so intentionally has no volume or network definitions
 services:
   redis:
     image: redis:7.2-alpine

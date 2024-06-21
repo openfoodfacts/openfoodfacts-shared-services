@@ -1,20 +1,23 @@
+# Used when running locally for ad-hoc testing
 services:
   redis:
     volumes:
       - redisdata:/data
     networks:
-      - shared_network
+      - common_net
 
   mongodb:
     volumes:
-      - ${MONGODB_DATA_DIR}:/data/db
+      - dbdata:/data/db
       - ./import:/import
     networks:
-      - shared_network
+      - common_net
 
 volumes:
+  dbdata:
   redisdata:
   
 networks:
-  shared_network:
-    name: shared_network
+  common_net:
+    external: true
+    name: ${COMMON_NET_NAME}
