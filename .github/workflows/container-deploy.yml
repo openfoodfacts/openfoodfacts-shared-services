@@ -84,11 +84,11 @@ jobs:
           echo "COMPOSE_HTTP_TIMEOUT=360" >> .env
 
           # Use old po project name for now so we don't disrupt the current deployment
-          echo "SHARED_PROJECT_NAME=po" >> .env
+          echo "COMPOSE_PROJECT_NAME=po" >> .env
           echo "COMMON_NET_NAME=${{ env.COMMON_NET_NAME }}" >> .env
 
           echo "COMPOSE_PATH_SEPARATOR=;" >> .env
-          echo "SHARED_COMPOSE_FILE=docker-compose.yml;docker/prod.yml" >> .env
+          echo "COMPOSE_FILE=docker-compose.yml;docker/prod.yml" >> .env
 
           # Use dbdata docker volume for now to keep consistency with previous po owned deployment
           echo "MONGODB_DATA_VOLUME=dbdata" >> .env

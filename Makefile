@@ -3,13 +3,10 @@ include .env
 
 export
 
-# Need to override here so we don't pick up values set up off-server
-override DOCKER_COMPOSE=COMPOSE_FILE="${SHARED_COMPOSE_FILE}" COMPOSE_PROJECT_NAME=${SHARED_PROJECT_NAME} docker compose
-
 run: create_external_networks
-# Make sure the import and dbadata directories are owned by the host, not docker
+# Make sure the import directy is owned by the host, not docker
 	@mkdir -p ./import
-	${DOCKER_COMPOSE} up -d
+	docker compose up -d
 
 import_prod_data: run
 	@echo "🥫 Importing production data (~2M products) into MongoDB …"
@@ -27,12 +24,12 @@ import_prod_data: run
 	wget --no-verbose https://static.openfoodfacts.org/data/gz-sha256sum -P ./import
 	cd ./import && sha256sum --check gz-sha256sum
 	@echo "🥫 Restoring the MongoDB dump …"
-	${DOCKER_COMPOSE} exec -T mongodb sh -c "cd /data/db && mongorestore --drop --gzip --archive=/import/openfoodfacts-mongodbdump.gz"
+	docker compose exec -T mongodb sh -c "cd /data/db && mongorestore --drop --gzip --archive=/import/openfoodfacts-mongodbdump.gz"
 	@rm ./import/openfoodfacts-mongodbdump.gz && rm ./import/gz-sha256sum
 
 restart_db:
 	@echo "🥫 Restarting MongoDB database …"
-	${DOCKER_COMPOSE} restart mongodb
+	docker compose restart mongodb
 
 livecheck:
 	@echo "🥫 Running livecheck …"
