@@ -7,5 +7,3 @@ services:
   mongodb:
     image: mongo:4.4
     command: mongod --wiredTigerCacheSizeGB ${MONGODB_CACHE_SIZE}
-    ports:
-      - ${MONGODB_EXPOSE:-127.0.0.1:27017}:27017
