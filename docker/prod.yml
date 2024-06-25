@@ -8,6 +8,8 @@ services:
 
   mongodb:
     restart: always
+    ports:
+      - ${MONGODB_EXPOSE:-127.0.0.1:27017}:27017
     volumes:
       # Use dbdata docker volume for now to keep consistency with previous po owned deployment
       - dbdata:/data/db
