@@ -1,6 +1,8 @@
 # Used when running locally for ad-hoc testing
 services:
   redis:
+    ports:
+      - ${REDIS_EXPOSE:-127.0.0.1:6379}:6379
     volumes:
       - redisdata:/data
     networks:
