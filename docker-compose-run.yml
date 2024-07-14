@@ -17,6 +17,10 @@ services:
     networks:
       - common_net
 
+  otel-collector:
+    networks:
+      - common_net
+
 volumes:
   dbdata:
   redisdata:
