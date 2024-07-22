@@ -2,8 +2,10 @@
 services:
   redis:
     image: redis:7.2-alpine
+    restart: ${RESTART_POLICY:-always}
     command: redis-server --save 60 1 --loglevel warning
 
   mongodb:
     image: mongo:4.4
+    restart: ${RESTART_POLICY:-always}
     command: mongod --wiredTigerCacheSizeGB ${MONGODB_CACHE_SIZE}
