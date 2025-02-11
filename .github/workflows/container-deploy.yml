@@ -83,6 +83,8 @@ jobs:
           echo "DOCKER_CLIENT_TIMEOUT=360" >> .env
           echo "COMPOSE_HTTP_TIMEOUT=360" >> .env
 
+          echo "RESTART_POLICY=always" >> .env
+
           # Use old po project name for now so we don't disrupt the current deployment
           echo "COMPOSE_PROJECT_NAME=po" >> .env
           echo "COMMON_NET_NAME=${{ env.COMMON_NET_NAME }}" >> .env
