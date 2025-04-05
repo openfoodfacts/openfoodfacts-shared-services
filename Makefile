@@ -37,7 +37,7 @@ livecheck:
 
 prune:
 	@echo "🥫 Pruning unused Docker artifacts (save space) …"
-	docker system prune -af
+	docker system prune -af --filter="label=com.docker.compose.project=${COMPOSE_PROJECT_NAME}"
 
 create_external_networks:
 	docker network create ${COMMON_NET_NAME} || true
