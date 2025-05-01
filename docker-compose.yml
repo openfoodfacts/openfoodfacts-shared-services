@@ -11,7 +11,6 @@ services:
     command: mongod --wiredTigerCacheSizeGB ${MONGODB_CACHE_SIZE}
 
   otel-collector:
-    image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.123.1
-    command: [ "--config=/etc/otel-collector-config.yaml" ]
+    image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.125.0
     volumes:
-      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+      - ./otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml

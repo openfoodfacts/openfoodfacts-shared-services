@@ -18,7 +18,7 @@ services:
       - common_net
 
   otel-collector:
-    image: jaegertracing/all-in-one:1.67.0
+    image: jaegertracing/all-in-one:1.68.0
     ports:
       - 127.0.0.1:55679:55679
       - 127.0.0.1:5775:5775/udp
