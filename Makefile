@@ -15,6 +15,8 @@ import_prod_data: run
 	@( rm -f ./import/openfoodfacts-mongodbdump.gz || true ) && ( rm -f ./import/gz-sha256sum || true )
 	@echo "🥫 Downloading full MongoDB dump from production …"
 # verify sufficient disk space before downloading
+# On macOS (Darwin), disk space checks are skipped because macOS handles disk space differently,
+# and the check may not be reliable or necessary in this environment.
 	@if [ "$$("uname")" = "Darwin" ]; then \
 	  echo "🥫 Skipping disk space check on macOS"; \
 	else \
