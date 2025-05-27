@@ -10,7 +10,3 @@ services:
     restart: ${RESTART_POLICY:-always}
     command: mongod --wiredTigerCacheSizeGB ${MONGODB_CACHE_SIZE}
 
-  otel-collector:
-    image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.125.0
-    volumes:
-      - ./otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
