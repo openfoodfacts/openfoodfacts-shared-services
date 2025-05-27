@@ -9,4 +9,3 @@ services:
     image: mongo:4.4
     restart: ${RESTART_POLICY:-always}
     command: mongod --wiredTigerCacheSizeGB ${MONGODB_CACHE_SIZE}
-
