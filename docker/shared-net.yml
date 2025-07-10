@@ -25,6 +25,14 @@ services:
     networks:
       - common_net
 
+  postgresql:
+    ports:
+      - "${POSTGRES_EXPOSE:5432}:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - common_net
+
 volumes:
   redisdata:
     external: true
@@ -33,6 +41,10 @@ volumes:
   dbdata:
     external: true
     name: ${MONGODB_DATA_VOLUME}
+
+  pg_data:
+    external: true
+    name: off_shared_pg_data
 
 networks:
   common_net:
