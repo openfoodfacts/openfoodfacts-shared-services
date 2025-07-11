@@ -97,16 +97,16 @@ jobs:
           echo "MONGODB_HOST=${{ env.MONGODB_HOST }}" >> .env
           echo "MONGODB_EXPOSE=27017" >> .env
 
-          echo "POSTGRES_IMAGE=pgautoupgrade/pgautoupgrade:16-alpine >> .env
-          echo "POSTGRES_USER=postgres >> .env
-          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env
-          echo "PG_BOOTSTRAP_USERNAME=bootstrap >> .env
-          echo "PG_BOOTSTRAP_PASSWORD=${{ secrets.PG_BOOTSTRAP_PASSWORD }} >> .env
+          echo "POSTGRES_IMAGE=pgautoupgrade/pgautoupgrade:16-alpine" >> .env
+          echo "POSTGRES_USER=postgres" >> .env
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
+          echo "PG_BOOTSTRAP_USERNAME=bootstrap" >> .env
+          echo "PG_BOOTSTRAP_PASSWORD=${{ secrets.PG_BOOTSTRAP_PASSWORD }}" >> .env
 
           # May want to make these environment specific if we were to deploy to production
           echo "POSTGRES_SHM_SIZE=256m" >> .env
-          echo "POSTGRES_SHARED_BUFFERS=128MB >> .env
-          echo "POSTGRES_WORK_MEM=4MB >> .env
+          echo "POSTGRES_SHARED_BUFFERS=128MB" >> .env
+          echo "POSTGRES_WORK_MEM=4MB" >> .env
 
     - name: Create Docker volumes and networks
       uses: appleboy/ssh-action@master
