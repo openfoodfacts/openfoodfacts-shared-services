@@ -17,9 +17,18 @@ services:
     networks:
       - common_net
 
+  postgresql:
+    ports:
+      - "${POSTGRES_EXPOSE:-127.0.0.1:5432}:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - common_net
+
 volumes:
   dbdata:
   redisdata:
+  pg_data:
   
 networks:
   common_net:
