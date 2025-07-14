@@ -1,4 +1,5 @@
-# This compose file is imported by PO for tests so intentionally has no volume or network definitions
+# This compose file is imported by PO for tests so intentionally has no volume or network definitions.
+# It also excludes the PostgreSQL service (for now)
 services:
   redis:
     image: redis:7.2-alpine
@@ -9,18 +10,3 @@ services:
     image: mongo:4.4
     restart: ${RESTART_POLICY:-always}
     command: mongod --wiredTigerCacheSizeGB ${MONGODB_CACHE_SIZE}
-
-  postgresql:
-    image: ${POSTGRES_IMAGE}
-    command: postgres -c shared_buffers=${POSTGRES_SHARED_BUFFERS:-128MB} -c work_mem=${POSTGRES_WORK_MEM:-4MB} -c listen_addresses='*'
-    restart: ${RESTART_POLICY:-always}
-    environment:
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-      - PGAUTO_REINDEX=no
-    shm_size: ${POSTGRES_SHM_SIZE:-256m}
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
-      interval: 1s
-      timeout: 5s
-      retries: 25
