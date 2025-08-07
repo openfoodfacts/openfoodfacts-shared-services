@@ -8,6 +8,9 @@ run: create_external_networks
 	@mkdir -p ./import
 	docker compose up --wait
 
+stop: 
+	docker compose stop
+
 import_prod_data: run
 	@echo "🥫 Importing production data (~2M products) into MongoDB …"
 	@echo "🥫 This might take up to 10 mn, so feel free to grab a coffee!"
