@@ -4,9 +4,12 @@ include .env
 export
 
 run: create_external_networks
-# Make sure the import directy is owned by the host, not docker
+# Make sure the import directory is owned by the host, not docker
 	@mkdir -p ./import
-	docker compose up -d
+	docker compose up --wait
+
+stop: 
+	docker compose stop
 
 import_prod_data: run
 	@echo "🥫 Importing production data (~2M products) into MongoDB …"
@@ -41,3 +44,28 @@ prune:
 
 create_external_networks:
 	docker network create ${COMMON_NET_NAME} || true
+
+# The escaping for this is complicated as psql needs newlines in the SQL and printf seems to be the only way to get them.
+# Need to quadruple escape the backslashes for the psql meta commands (like "\if") as bash interprets them first and then printf second.
+# Need -T on docker exec to disable the automatic TTY allocation. Otherwise get "the input device is not a TTY"
+create_bootstrap:
+	@printf "SELECT NOT EXISTS(SELECT 1 FROM pg_roles WHERE rolname = '${PG_BOOTSTRAP_USERNAME}') AS bootstrap_needed \\\\gset \n\
+	\\\\if :bootstrap_needed \n\
+ 		create role ${PG_BOOTSTRAP_USERNAME} with password '${PG_BOOTSTRAP_PASSWORD}' login createdb createrole; \n\
+ 	\\\\endif \n" | docker compose exec -T -e PGUSER=${POSTGRES_USER} postgresql psql
+
+# Creates a user and database for a service. Database name is the same as the username
+# Usage (typically called from another Makefile):
+# cd ${DEPS_DIR}/openfoodfacts-shared-services && $(MAKE) create_user username=${MY_SERVICE_USERNAME} password=${MY_SERVICE_PASSWORD}
+create_user: create_bootstrap
+# Connect as the bootstrap user to create the service user
+	@printf "SELECT NOT EXISTS(SELECT 1 FROM pg_roles WHERE rolname = '${username}') AS user_needed \\\\gset \n\
+	\\\\if :user_needed \n\
+ 		create role ${username} with password '${password}' login createdb; \n\
+ 	\\\\endif \n" | docker compose exec -T -e PGUSER=${PG_BOOTSTRAP_USERNAME} -e PGDATABASE=${POSTGRES_USER} postgresql psql
+
+# Then connect as the service user to create the service database
+	@printf "SELECT NOT EXISTS(SELECT FROM pg_database WHERE datname = '${username}') AS db_needed \\\\gset \n\
+	\\\\if :db_needed \n\
+ 		create database ${username}; \n\
+ 	\\\\endif \n" | docker compose exec -T -e PGUSER=${username} -e PGDATABASE=${POSTGRES_USER} postgresql psql

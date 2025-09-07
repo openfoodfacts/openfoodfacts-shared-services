@@ -17,13 +17,34 @@ services:
     networks:
       - common_net
 
+  postgresql:
+    image: ${POSTGRES_IMAGE}
+    command: postgres -c shared_buffers=${POSTGRES_SHARED_BUFFERS} -c work_mem=${POSTGRES_WORK_MEM} -c listen_addresses='*'
+    restart: ${RESTART_POLICY:-always}
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - PGAUTO_REINDEX=no
+    shm_size: ${POSTGRES_SHM_SIZE}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 1s
+      timeout: 5s
+      retries: 25
+    ports:
+      - "${POSTGRES_EXPOSE:-127.0.0.1:5432}:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - common_net
+
   # Note this is only used for local development. In production,
   # central monitoring platform is used to collect metrics
   # and traces: https://github.com/openfoodfacts/openfoodfacts-monitoring
   otel-collector:
     image: docker.io/grafana/otel-lgtm:latest
     environment:
-      - GF_PATHS_DATA=/data/grafana 
+      - GF_PATHS_DATA=/data/grafana
     ports:
       - 127.0.0.1:3000:3000
       - 127.0.0.1:4317:4317
@@ -34,7 +55,8 @@ services:
 volumes:
   dbdata:
   redisdata:
-  
+  pg_data:
+
 networks:
   common_net:
     external: true

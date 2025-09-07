@@ -49,7 +49,6 @@ jobs:
         proxy_host: ${{ env.SSH_PROXY_HOST }}
         proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
-        script_stop: false
         script: |
           # Clone Git repository if not already there
           [ ! -d '${{ matrix.env }}' ] && git clone --depth 1 https://github.com/${{ github.repository }} ${{ matrix.env }} --no-single-branch 2>&1
@@ -72,7 +71,6 @@ jobs:
         proxy_host: ${{ env.SSH_PROXY_HOST }}
         proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
-        script_stop: false
         script: |
           # Go to repository directory
           cd ${{ matrix.env }}
@@ -90,14 +88,24 @@ jobs:
           echo "COMMON_NET_NAME=${{ env.COMMON_NET_NAME }}" >> .env
 
           echo "COMPOSE_PATH_SEPARATOR=;" >> .env
-          echo "COMPOSE_FILE=docker-compose.yml;docker/prod.yml" >> .env
+          echo "COMPOSE_FILE=docker-compose.yml;docker/${{ matrix.env }}.yml" >> .env
 
           # Use dbdata docker volume for now to keep consistency with previous po owned deployment
           echo "MONGODB_DATA_VOLUME=dbdata" >> .env
           # Set App variables
           echo "MONGODB_CACHE_SIZE=${{ env.MONGODB_CACHE_SIZE }}" >> .env
           echo "MONGODB_HOST=${{ env.MONGODB_HOST }}" >> .env
-          echo "MONGODB_EXPOSE=27017" >> .env
+
+          echo "POSTGRES_IMAGE=pgautoupgrade/pgautoupgrade:16-alpine" >> .env
+          echo "POSTGRES_USER=postgres" >> .env
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
+          echo "PG_BOOTSTRAP_USERNAME=bootstrap" >> .env
+          echo "PG_BOOTSTRAP_PASSWORD=${{ secrets.PG_BOOTSTRAP_PASSWORD }}" >> .env
+
+          # May want to make these environment specific if we were to deploy to production
+          echo "POSTGRES_SHM_SIZE=256m" >> .env
+          echo "POSTGRES_SHARED_BUFFERS=128MB" >> .env
+          echo "POSTGRES_WORK_MEM=4MB" >> .env
 
     - name: Create Docker volumes and networks
       uses: appleboy/ssh-action@master
@@ -108,13 +116,14 @@ jobs:
         proxy_host: ${{ env.SSH_PROXY_HOST }}
         proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
-        script_stop: false
         # Note again hard-coded po prefixes are used for now
         script: |
           docker volume create dbdata \
           || echo "dbdata volume already exists"
           docker volume create --driver=local -o type=none -o o=bind -o device=/srv/off/docker_data/redis po_redisdata \
           || echo "redisdata volume already exists"
+          docker volume create --driver=local -o type=none -o o=bind -o device=/srv/off/docker_data/off_shared_pg_data off_shared_pg_data \
+          || echo "off_shared_pg_data volume already exists"
 
     - name: Start services
       uses: appleboy/ssh-action@master
@@ -126,7 +135,6 @@ jobs:
         proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
         command_timeout: 15m
-        script_stop: false
         script: |
           cd ${{ matrix.env }}
           make run
@@ -141,7 +149,6 @@ jobs:
         proxy_host: ${{ env.SSH_PROXY_HOST }}
         proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
-        script_stop: false
         script: |
           cd ${{ matrix.env }} && \
           make livecheck
@@ -156,7 +163,6 @@ jobs:
         proxy_host: ${{ env.SSH_PROXY_HOST }}
         proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
-        script_stop: false
         script: |
           cd ${{ matrix.env }} && \
           make prune

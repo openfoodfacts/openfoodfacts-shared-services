@@ -1,4 +1,5 @@
-# This compose file is imported by PO for tests so intentionally has no volume or network definitions
+# This compose file is imported by PO for tests so intentionally has no volume or network definitions.
+# It also excludes the PostgreSQL service (for now)
 services:
   redis:
     image: redis:7.2-alpine
