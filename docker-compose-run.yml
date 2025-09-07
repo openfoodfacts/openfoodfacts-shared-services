@@ -38,11 +38,25 @@ services:
     networks:
       - common_net
 
+  # Note this is only used for local development. In production,
+  # central monitoring platform is used to collect metrics
+  # and traces: https://github.com/openfoodfacts/openfoodfacts-monitoring
+  otel-collector:
+    image: docker.io/grafana/otel-lgtm:latest
+    environment:
+      - GF_PATHS_DATA=/data/grafana
+    ports:
+      - 127.0.0.1:3000:3000
+      - 127.0.0.1:4317:4317
+      - 127.0.0.1:4318:4318
+    networks:
+      - common_net
+
 volumes:
   dbdata:
   redisdata:
   pg_data:
-  
+
 networks:
   common_net:
     external: true
