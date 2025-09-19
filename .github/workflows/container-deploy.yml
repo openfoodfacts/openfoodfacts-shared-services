@@ -83,15 +83,12 @@ jobs:
 
           echo "RESTART_POLICY=always" >> .env
 
-          # Use old po project name for now so we don't disrupt the current deployment
-          echo "COMPOSE_PROJECT_NAME=po" >> .env
+          echo "COMPOSE_PROJECT_NAME=off_shared" >> .env
           echo "COMMON_NET_NAME=${{ env.COMMON_NET_NAME }}" >> .env
 
           echo "COMPOSE_PATH_SEPARATOR=;" >> .env
           echo "COMPOSE_FILE=docker-compose.yml;docker/${{ matrix.env }}.yml" >> .env
 
-          # Use dbdata docker volume for now to keep consistency with previous po owned deployment
-          echo "MONGODB_DATA_VOLUME=dbdata" >> .env
           # Set App variables
           echo "MONGODB_CACHE_SIZE=${{ env.MONGODB_CACHE_SIZE }}" >> .env
           echo "MONGODB_HOST=${{ env.MONGODB_HOST }}" >> .env
@@ -137,7 +134,15 @@ jobs:
         command_timeout: 15m
         script: |
           cd ${{ matrix.env }}
-          make run
+
+          # Note this is temporary code to stop the old po containers while the project is being renamed
+          # It can be removed once staging has been upgraded
+          docker rm -f po-mongodb_exporter-1 || echo "Old container already stopped. Can remove this code"
+          docker rm -f po-mongodb-1 || echo "Old container already stopped. Can remove this code"
+          docker rm -f po-redis-1 || echo "Old container already stopped. Can remove this code"
+          # End of temporary code
+
+          make up
 
     - name: Check services are up
       uses: appleboy/ssh-action@master

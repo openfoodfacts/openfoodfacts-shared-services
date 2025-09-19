@@ -11,7 +11,6 @@ services:
     ports:
       - 27017:27017
     volumes:
-      # Use dbdata docker volume for now to keep consistency with previous po owned deployment
       - dbdata:/data/db
       - ./import:/import
     networks:
@@ -36,11 +35,13 @@ services:
 volumes:
   redisdata:
     external: true
-    name: ${COMPOSE_PROJECT_NAME}_redisdata
+    # Use this docker volume name to keep consistency with previous po owned deployment
+    name: po_redisdata
 
   dbdata:
     external: true
-    name: ${MONGODB_DATA_VOLUME}
+    # Use this docker volume name to keep consistency with previous po owned deployment
+    name: dbdata
 
   pg_data:
     external: true
