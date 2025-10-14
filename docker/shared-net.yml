@@ -35,9 +35,11 @@ services:
     shm_size: ${POSTGRES_SHM_SIZE}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
-      interval: 1s
+      interval: 10s
       timeout: 5s
-      retries: 25
+      start_interval: 1s
+      start_period: 60s
+      retries: 2
     ports:
       - "${POSTGRES_EXPOSE:-127.0.0.1:5432}:5432"
     volumes:
@@ -48,13 +50,11 @@ services:
 volumes:
   redisdata:
     external: true
-    # Use this docker volume name to keep consistency with previous po owned deployment
-    name: po_redisdata
+    name: off_shared_redisdata
 
   dbdata:
     external: true
-    # Use this docker volume name to keep consistency with previous po owned deployment
-    name: dbdata
+    name: off_shared_mongodb_data
 
   pg_data:
     external: true

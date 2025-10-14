@@ -115,10 +115,10 @@ jobs:
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
         # Note again hard-coded po prefixes are used for now
         script: |
-          docker volume create dbdata \
-          || echo "dbdata volume already exists"
-          docker volume create --driver=local -o type=none -o o=bind -o device=/srv/off/docker_data/redis po_redisdata \
-          || echo "redisdata volume already exists"
+          docker volume create off_shared_mongodb_data \
+          || echo "off_shared_mongodb_data volume already exists"
+          docker volume create --driver=local -o type=none -o o=bind -o device=/srv/off/docker_data/off_shared_redisdata off_shared_redisdata \
+          || echo "off_shared_redisdata volume already exists"
           docker volume create --driver=local -o type=none -o o=bind -o device=/srv/off/docker_data/off_shared_pg_data off_shared_pg_data \
           || echo "off_shared_pg_data volume already exists"
 
