@@ -26,8 +26,21 @@ services:
       - common_net
 
   postgresql:
+    image: ${POSTGRES_IMAGE}
+    command: postgres -c shared_buffers=${POSTGRES_SHARED_BUFFERS} -c work_mem=${POSTGRES_WORK_MEM} -c listen_addresses='*'
+    restart: ${RESTART_POLICY:-always}
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - PGAUTO_REINDEX=no
+    shm_size: ${POSTGRES_SHM_SIZE}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 1s
+      timeout: 5s
+      retries: 25
     ports:
-      - 5432:5432
+      - "${POSTGRES_EXPOSE:-127.0.0.1:5432}:5432"
     volumes:
       - pg_data:/var/lib/postgresql/data
     networks:
