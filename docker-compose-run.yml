@@ -7,6 +7,9 @@ services:
       - redisdata:/data
     networks:
       - common_net
+    profiles:
+      - all
+      - redis
 
   mongodb:
     ports:
@@ -16,6 +19,9 @@ services:
       - ./import:/import
     networks:
       - common_net
+    profiles:
+      - all
+      - mongodb
 
   postgresql:
     image: ${POSTGRES_IMAGE}
@@ -39,12 +45,15 @@ services:
       - pg_data:/var/lib/postgresql/data
     networks:
       - common_net
+    profiles:
+      - all
+      - postgresql
 
 volumes:
   dbdata:
   redisdata:
   pg_data:
-  
+
 networks:
   common_net:
     external: true

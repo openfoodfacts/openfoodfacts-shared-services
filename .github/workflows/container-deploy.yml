@@ -5,9 +5,10 @@ on:
     branches:
       - main
       - deploy-*
-    # We don't currently automatically deploy to production so no release tag filters needed
-    # tags:
-    #   - v*.*.*
+      # FIXME: temporary
+      - ci-mongo-prod
+    tags:
+      - v*.*.*
 
 # Note on secrets used for connection
 # SSH_PRIVATE_KEY is the private key (shared between VM and host)
@@ -17,7 +18,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        env: [shared-net]
+        env:
+          # FIXME remove temporary ci-mongo-prod condition
+          - ${{ (startsWith(github.ref, 'refs/tags/v') || contains(github.ref, 'ci-mongo-prod')) && 'shared-org' || 'shared-net' }}
     environment: ${{ matrix.env }}
     concurrency: ${{ matrix.env }}
     steps:
@@ -26,6 +29,7 @@ jobs:
       if: matrix.env == 'shared-net'
       run: |
         # configs
+        echo "COMPOSE_PROJECT_NAME=off_shared" >> $GITHUB_ENV
         echo "MONGODB_CACHE_SIZE=14" >> $GITHUB_ENV
         echo "MONGODB_HOST=10.1.0.200" >> $GITHUB_ENV
         # deploy target
@@ -37,8 +41,15 @@ jobs:
     - name: Set various variable for prod (org) deployment
       if: matrix.env == 'shared-org'
       run: |
-        # FIXME: we do not deploy to prod currently
-        false
+        # configs
+        echo "COMPOSE_PROJECT_NAME=off_shared" >> $GITHUB_ENV
+        echo "MONGODB_CACHE_SIZE=14" >> $GITHUB_ENV
+        echo "MONGODB_HOST=10.13.1.200" >> $GITHUB_ENV
+        # deploy target
+        echo "SSH_HOST=10.13.1.200" >> $GITHUB_ENV
+        echo "SSH_PROXY_HOST=scaleway-02.openfoodfacts.org" >> $GITHUB_ENV
+        echo "SSH_USERNAME=off" >> $GITHUB_ENV
+        echo "COMMON_NET_NAME=po_webnet" >> $GITHUB_ENV
 
     - name: Checkout git repository
       uses: appleboy/ssh-action@master
@@ -83,11 +94,12 @@ jobs:
 
           echo "RESTART_POLICY=always" >> .env
 
-          echo "COMPOSE_PROJECT_NAME=off_shared" >> .env
+          echo "COMPOSE_PROJECT_NAME=${{ env.COMPOSE_PROJECT_NAME }}" >> .env
           echo "COMMON_NET_NAME=${{ env.COMMON_NET_NAME }}" >> .env
 
           echo "COMPOSE_PATH_SEPARATOR=;" >> .env
-          echo "COMPOSE_FILE=docker-compose.yml;docker/${{ matrix.env }}.yml" >> .env
+          echo "COMPOSE_FILE=docker-compose.yml;docker/prod.yml;docker/monitoring.yml;" >> .env
+          echo "COMPOSE_PROFILES=all" >> .env
 
           # Set App variables
           echo "MONGODB_CACHE_SIZE=${{ env.MONGODB_CACHE_SIZE }}" >> .env
@@ -114,12 +126,21 @@ jobs:
         proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          docker volume create off_shared_mongodb_data \
-          || echo "off_shared_mongodb_data volume already exists"
-          docker volume create --driver=local -o type=none -o o=bind -o device=/srv/off/docker_data/off_shared_redisdata off_shared_redisdata \
-          || echo "off_shared_redisdata volume already exists"
-          docker volume create --driver=local -o type=none -o o=bind -o device=/srv/off/docker_data/off_shared_pg_data off_shared_pg_data \
-          || echo "off_shared_pg_data volume already exists"
+          docker volume create ${{ env.COMPOSE_PROJECT_NAME }}_mongodb_data \
+          || echo "${{ env.COMPOSE_PROJECT_NAME }}_mongodb_data volume already exists"
+          if [[ "{{ matrix.env }}" == "shared-org"]]
+          then
+            docker volume create ${{ env.COMPOSE_PROJECT_NAME }}_redis_data \
+            || echo ${{ env.COMPOSE_PROJECT_NAME }}_redis_data volume already exists"
+            docker volume create ${{ env.COMPOSE_PROJECT_NAME }}_pg_data \
+            || echo ${{ env.COMPOSE_PROJECT_NAME }}_pg_data volume already exists"
+          else
+            # on staging we have part of docker data on a specific disk and location
+            docker volume create --driver=local -o type=none -o o=bind -o device=/srv/off/docker_data/${{ env.COMPOSE_PROJECT_NAME }}_redisdata ${{ env.COMPOSE_PROJECT_NAME }}_redisdata \
+            || echo "${{ env.COMPOSE_PROJECT_NAME }}_redisdata volume already exists"
+            docker volume create --driver=local -o type=none -o o=bind -o device=/srv/off/docker_data/${{ env.COMPOSE_PROJECT_NAME }}_pg_data ${{ env.COMPOSE_PROJECT_NAME }}_pg_data \
+            || echo "${{ env.COMPOSE_PROJECT_NAME }}_pg_data volume already exists"
+          fi
 
     - name: Start services
       uses: appleboy/ssh-action@master
