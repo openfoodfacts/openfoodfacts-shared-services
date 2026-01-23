@@ -34,6 +34,10 @@ jobs:
         echo "SSH_PROXY_HOST=ovh1.openfoodfacts.org" >> $GITHUB_ENV
         echo "SSH_USERNAME=off" >> $GITHUB_ENV
         echo "COMMON_NET_NAME=po_webnet" >> $GITHUB_ENV
+        # in -net we only need to expose mongodb, as the rest ues docker common_net
+        echo "MONGODB_EXPOSE=27017" >> $GITHUB_ENV
+        echo "REDIS_EXPOSE=127.0.0.1:6379" >> $GITHUB_ENV
+        echo "POSTGRES_EXPOSE=127.0.0.1:5432" >> $GITHUB_ENV
 
     - name: Set various variable for prod (org) deployment
       if: matrix.env == 'shared-org'
@@ -47,6 +51,10 @@ jobs:
         echo "SSH_PROXY_HOST=scaleway-02.infra.openfoodfacts.org" >> $GITHUB_ENV
         echo "SSH_USERNAME=off" >> $GITHUB_ENV
         echo "COMMON_NET_NAME=po_webnet" >> $GITHUB_ENV
+        # in -org we need to expose all services
+        echo "MONGODB_EXPOSE=27017" >> $GITHUB_ENV
+        echo "REDIS_EXPOSE=6379" >> $GITHUB_ENV
+        echo "POSTGRES_EXPOSE=5432" >> $GITHUB_ENV
 
     - name: Checkout git repository
       uses: appleboy/ssh-action@master
@@ -97,6 +105,10 @@ jobs:
           echo "COMPOSE_PATH_SEPARATOR=;" >> .env
           echo "COMPOSE_FILE=docker-compose.yml;docker-compose-run.yml;docker/prod.yml;docker/monitoring.yml" >> .env
           echo "COMPOSE_PROFILES=all" >> .env
+
+          echo "MONGODB_EXPOSE=${{ env.MONGODB_EXPOSE }}" >> .env
+          echo "REDIS_EXPOSE=${{ env.REDIS_EXPOSE }}" >> .env
+          echo "POSTGRES_EXPOSE=${{ env.POSTGRES_EXPOSE }}" >> .env
 
           # Set App variables
           echo "MONGODB_CACHE_SIZE=${{ env.MONGODB_CACHE_SIZE }}" >> .env
