@@ -4,7 +4,7 @@ services:
     image: bitnami/mongodb-exporter:latest
     command: --discovering-mode --mongodb.uri=mongodb://mongodb:27017/admin?ssl=false
     ports:
-      - ${MONGODB_EXPORTER_EXPOSE:-9216}:9216
+      - ${MONGODB_EXPORTER_EXPOSE:-127.0.0.1:5701}:9216
     networks:
       - common_net
     profiles:
@@ -15,7 +15,7 @@ services:
     image: bitnami/redis-exporter:latest
     command: --redis.addr=redis://redis:6379
     ports:
-      - ${REDIS_EXPORTER_EXPOSE:-9121}:9121
+      - ${REDIS_EXPORTER_EXPOSE:-127.0.0.1:5702}:9121
     networks:
       - common_net
     profiles:
@@ -29,7 +29,7 @@ services:
       DATA_SOURCE_USER: ${POSTGRES_USER}
       DATA_SOURCE_PASS: ${POSTGRES_PASSWORD}
     ports:
-      -  ${POSTGRES_EXPORTER_EXPOSE:-9187}:9187
+      -  ${POSTGRES_EXPORTER_EXPOSE:-127.0.0.1:5703}:9187
     networks:
       - common_net
     profiles:
