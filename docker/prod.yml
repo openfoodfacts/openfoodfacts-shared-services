@@ -1,0 +1,18 @@
+
+volumes:
+  redisdata:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME}_redisdata
+
+  dbdata:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME}_mongodb_data
+
+  pg_data:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME}_pg_data
+
+networks:
+  common_net:
+    external: true
+    name: ${COMMON_NET_NAME}
