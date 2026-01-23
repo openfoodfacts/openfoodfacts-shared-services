@@ -2,7 +2,7 @@
 services:
   mongodb_exporter:
     image: bitnami/mongodb-exporter:latest
-    command: --discovering-mode --mongodb.uri=mongodb://mongodb:27017/admin?ssl=true
+    command: --discovering-mode --mongodb.uri=mongodb://mongodb:27017/admin?ssl=false
     ports:
       - ${MONGODB_EXPORTER_EXPOSE:-9216}:9216
     networks:
@@ -13,7 +13,7 @@ services:
 
   redis_exporter:
     image: bitnami/redis-exporter:latest
-    command: --redis.addr==redis://redis:6379
+    command: --redis.addr=redis://redis:6379
     ports:
       - ${REDIS_EXPORTER_EXPOSE:-9121}:9121
     networks:

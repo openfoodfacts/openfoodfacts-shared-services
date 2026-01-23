@@ -130,10 +130,10 @@ jobs:
           || echo "${{ env.COMPOSE_PROJECT_NAME }}_mongodb_data volume already exists"
           if [ "{{ matrix.env }}" == "shared-org" ]
           then
-            docker volume create ${{ env.COMPOSE_PROJECT_NAME }}_redis_data \
-            || echo ${{ env.COMPOSE_PROJECT_NAME }}_redis_data volume already exists"
+            docker volume create ${{ env.COMPOSE_PROJECT_NAME }}_redisdata \
+            || echo "${{ env.COMPOSE_PROJECT_NAME }}_redis_data volume already exists"
             docker volume create ${{ env.COMPOSE_PROJECT_NAME }}_pg_data \
-            || echo ${{ env.COMPOSE_PROJECT_NAME }}_pg_data volume already exists"
+            || echo "${{ env.COMPOSE_PROJECT_NAME }}_pg_data volume already exists"
           else
             # on staging we have part of docker data on a specific disk and location
             docker volume create --driver=local -o type=none -o o=bind -o device=/srv/off/docker_data/${{ env.COMPOSE_PROJECT_NAME }}_redisdata ${{ env.COMPOSE_PROJECT_NAME }}_redisdata \
