@@ -38,6 +38,10 @@ jobs:
         echo "MONGODB_EXPOSE=27017" >> $GITHUB_ENV
         echo "REDIS_EXPOSE=127.0.0.1:6379" >> $GITHUB_ENV
         echo "POSTGRES_EXPOSE=127.0.0.1:5432" >> $GITHUB_ENV
+        # avoid conflict with robotoff exporter
+        echo "MONGODB_EXPORTER_EXPOSE=19216" >> $GITHUB_ENV
+        echo "REDIS_EXPORTER_EXPOSE=19121" >> $GITHUB_ENV
+        echo "POSTGRES_EXPORTER_EXPOSE=19187" >> $GITHUB_ENV
 
     - name: Set various variable for prod (org) deployment
       if: matrix.env == 'shared-org'
@@ -109,6 +113,10 @@ jobs:
           echo "MONGODB_EXPOSE=${{ env.MONGODB_EXPOSE }}" >> .env
           echo "REDIS_EXPOSE=${{ env.REDIS_EXPOSE }}" >> .env
           echo "POSTGRES_EXPOSE=${{ env.POSTGRES_EXPOSE }}" >> .env
+          # some might be empty, but it's ok, it will take default values
+          echo "POSTGRES_EXPORTER_EXPOSE=${{ env.POSTGRES_EXPORTER_EXPOSE }}" >> .env
+          echo "POSTGRES_EXPORTER_EXPOSE=${{ env.POSTGRES_EXPORTER_EXPOSE }}" >> .env
+          echo "POSTGRES_EXPORTER_EXPOSE=${{ env.POSTGRES_EXPORTER_EXPOSE }}" >> .env
 
           # Set App variables
           echo "MONGODB_CACHE_SIZE=${{ env.MONGODB_CACHE_SIZE }}" >> .env
