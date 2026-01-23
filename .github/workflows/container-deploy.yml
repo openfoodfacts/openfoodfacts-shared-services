@@ -112,7 +112,7 @@ jobs:
           # expose exporters on specific ports, see https://github.com/openfoodfacts/.github/blob/main/docs/ports-and-project-names.md
           echo "MONGODB_EXPORTER_EXPOSE=5701" >> .env
           echo "REDIS_EXPORTER_EXPOSE=5702" >> .env
-          echo "POSTGRES_EXPORTER_EXPOSE=5003" >> .env
+          echo "POSTGRES_EXPORTER_EXPOSE=5703" >> .env
 
           # Set App variables
           echo "MONGODB_CACHE_SIZE=${{ env.MONGODB_CACHE_SIZE }}" >> .env
