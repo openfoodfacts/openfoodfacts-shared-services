@@ -128,7 +128,7 @@ jobs:
         script: |
           docker volume create ${{ env.COMPOSE_PROJECT_NAME }}_mongodb_data \
           || echo "${{ env.COMPOSE_PROJECT_NAME }}_mongodb_data volume already exists"
-          if [[ "{{ matrix.env }}" == "shared-org"]]
+          if [ "{{ matrix.env }}" == "shared-org"]
           then
             docker volume create ${{ env.COMPOSE_PROJECT_NAME }}_redis_data \
             || echo ${{ env.COMPOSE_PROJECT_NAME }}_redis_data volume already exists"
