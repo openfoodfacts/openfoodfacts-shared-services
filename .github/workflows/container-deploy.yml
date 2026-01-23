@@ -43,11 +43,11 @@ jobs:
       run: |
         # configs
         echo "COMPOSE_PROJECT_NAME=off_shared" >> $GITHUB_ENV
-        echo "MONGODB_CACHE_SIZE=14" >> $GITHUB_ENV
+        echo "MONGODB_CACHE_SIZE=32" >> $GITHUB_ENV
         echo "MONGODB_HOST=10.13.1.200" >> $GITHUB_ENV
         # deploy target
         echo "SSH_HOST=10.13.1.200" >> $GITHUB_ENV
-        echo "SSH_PROXY_HOST=scaleway-02.openfoodfacts.org" >> $GITHUB_ENV
+        echo "SSH_PROXY_HOST=scaleway-02.infra.openfoodfacts.org" >> $GITHUB_ENV
         echo "SSH_USERNAME=off" >> $GITHUB_ENV
         echo "COMMON_NET_NAME=po_webnet" >> $GITHUB_ENV
 
@@ -98,7 +98,7 @@ jobs:
           echo "COMMON_NET_NAME=${{ env.COMMON_NET_NAME }}" >> .env
 
           echo "COMPOSE_PATH_SEPARATOR=;" >> .env
-          echo "COMPOSE_FILE=docker-compose.yml;docker/prod.yml;docker/monitoring.yml;" >> .env
+          echo "COMPOSE_FILE=docker-compose.yml;docker-compose-run.yml;docker/prod.yml;docker/monitoring.yml;" >> .env
           echo "COMPOSE_PROFILES=all" >> .env
 
           # Set App variables

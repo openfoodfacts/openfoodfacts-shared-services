@@ -1,35 +1,35 @@
 
-  redis_exporter:
-    image: bitnami/mongodb-exporter:0
+services:
+  mongodb_exporter:
+    image: bitnami/mongodb-exporter:latest
     command: --discovering-mode --mongodb.uri=mongodb://mongodb:27017/admin?ssl=true
     ports:
-      - 9216:9216
-    networks:
-      - common_net
-    profiles:
-      - all
-      - redis
-
-  mongodb_exporter:
-    image: bitnami/redis-exporter:latest
-    command: --redis.addr==redis://redis:6379
-    ports:
-      - 9121:9121
+      - ${MONGODB_EXPORTER_EXPOSE:-9216}:9216
     networks:
       - common_net
     profiles:
       - all
       - mongodb
 
+  redis_exporter:
+    image: bitnami/redis-exporter:latest
+    command: --redis.addr==redis://redis:6379
+    ports:
+      - ${REDIS_EXPORTER_EXPOSE:-9121}:9121
+    networks:
+      - common_net
+    profiles:
+      - all
+      - redis
+
   postgres_exporter:
     image: bitnami/postgres-exporter:latest
-    env:
+    environment:
       DATA_SOURCE_URI: postgresql://postgresql:5432/?sslmode=disable
       DATA_SOURCE_USER: ${POSTGRES_USER}
       DATA_SOURCE_PASS: ${POSTGRES_PASSWORD}
-    command: --redis.addr==redis://redis:6379
     ports:
-      - 9121:9121
+      -  ${POSTGRES_EXPORTER_EXPOSE:-9187}:9187
     networks:
       - common_net
     profiles:
