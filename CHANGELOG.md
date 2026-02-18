@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/openfoodfacts/openfoodfacts-shared-services/compare/v1.0.0...v1.0.1) (2026-02-18)
+
+
+### Bug Fixes
+
+* Add restart policy to monitoring services ([#28](https://github.com/openfoodfacts/openfoodfacts-shared-services/issues/28)) ([513b196](https://github.com/openfoodfacts/openfoodfacts-shared-services/commit/513b196e265ca95f48ad793f38e9f848104e0e8c))
+
 ## 1.0.0 (2026-01-28)
 
 
