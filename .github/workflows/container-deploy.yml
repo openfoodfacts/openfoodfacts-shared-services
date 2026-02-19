@@ -103,7 +103,7 @@ jobs:
           echo "COMMON_NET_NAME=${{ env.COMMON_NET_NAME }}" >> .env
 
           echo "COMPOSE_PATH_SEPARATOR=;" >> .env
-          echo "COMPOSE_FILE=docker-compose.yml;docker-compose-run.yml;docker/prod.yml;docker/monitoring.yml" >> .env
+          echo "COMPOSE_FILE=docker-compose.yml;docker-compose-run.yml;docker/prod.yml;docker/monitor.yml" >> .env
           echo "COMPOSE_PROFILES=all" >> .env
 
           echo "MONGODB_EXPOSE=${{ env.MONGODB_EXPOSE }}" >> .env
