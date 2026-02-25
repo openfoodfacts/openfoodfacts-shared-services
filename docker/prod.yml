@@ -1,3 +1,18 @@
+x-services-ulimits: &services-ulimits
+  nofile: 128000
+  # 512M
+  stack: 536870912
+
+
+services:
+  mongodb:
+    ulimits: *services-ulimits
+
+  redis:
+    ulimits: *services-ulimits
+ 
+  postgresql:
+    ulimits: *services-ulimits
 
 volumes:
   redisdata:
