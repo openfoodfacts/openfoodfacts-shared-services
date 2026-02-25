@@ -44,7 +44,7 @@ jobs:
       run: |
         # configs
         echo "COMPOSE_PROJECT_NAME=off_shared" >> $GITHUB_ENV
-        echo "MONGODB_CACHE_SIZE=32" >> $GITHUB_ENV
+        echo "MONGODB_CACHE_SIZE=64" >> $GITHUB_ENV
         echo "MONGODB_HOST=10.13.1.200" >> $GITHUB_ENV
         # deploy target
         echo "SSH_HOST=10.13.1.200" >> $GITHUB_ENV
