@@ -138,11 +138,11 @@ jobs:
           echo "PG_BOOTSTRAP_PASSWORD=${{ secrets.PG_BOOTSTRAP_PASSWORD }}" >> .env
 
           # Postgres resources
-          echo "POSTGRES_SHM_SIZE={{ env.POSTGRES_SHM_SIZE }}" >> .env
-          echo "POSTGRES_SHARED_BUFFERS={{ env.POSTGRES_SHARED_BUFFERS }}" >> .env
-          echo "POSTGRES_WORK_MEM={{ env.POSTGRES_WORK_MEM }}" >> .env
+          echo "POSTGRES_SHM_SIZE=${{ env.POSTGRES_SHM_SIZE }}" >> .env
+          echo "POSTGRES_SHARED_BUFFERS=${{ env.POSTGRES_SHARED_BUFFERS }}" >> .env
+          echo "POSTGRES_WORK_MEM=${{ env.POSTGRES_WORK_MEM }}" >> .env
           # ZFS do a lot of caching
-          echo "POSTGRES_EFFECTIVE_CACHE_SIZE={{ env.POSTGRES_EFFECTIVE_CACHE_SIZE }}" >> .env
+          echo "POSTGRES_EFFECTIVE_CACHE_SIZE=${{ env.POSTGRES_EFFECTIVE_CACHE_SIZE }}" >> .env
 
     - name: Create Docker volumes and networks
       uses: appleboy/ssh-action@master
