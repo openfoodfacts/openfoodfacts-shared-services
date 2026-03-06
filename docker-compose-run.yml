@@ -25,7 +25,13 @@ services:
 
   postgresql:
     image: ${POSTGRES_IMAGE}
-    command: postgres -c shared_buffers=${POSTGRES_SHARED_BUFFERS} -c work_mem=${POSTGRES_WORK_MEM} -c listen_addresses='*'
+    command: [
+      "postgres",
+      "-c", "shared_buffers=${POSTGRES_SHARED_BUFFERS}",
+      "-c", "work_mem=${POSTGRES_WORK_MEM}",
+      "-c", "effective_cache_size=${POSTGRES_EFFECTIVE_CACHE_SIZE}",
+      "-c", "listen_addresses=*"
+    ]
     restart: ${RESTART_POLICY:-always}
     environment:
       - POSTGRES_USER
