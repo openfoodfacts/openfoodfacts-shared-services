@@ -38,6 +38,13 @@ jobs:
         echo "MONGODB_EXPOSE=27017" >> $GITHUB_ENV
         echo "REDIS_EXPOSE=127.0.0.1:6379" >> $GITHUB_ENV
         echo "POSTGRES_EXPOSE=127.0.0.1:5432" >> $GITHUB_ENV
+        # Postgres resources
+        echo "POSTGRES_SHM_SIZE=256Mb" >> $GITHUB_ENV
+        echo "POSTGRES_SHARED_BUFFERS=128Mb" >> $GITHUB_ENV
+        # we don't have much traffic on .net, so we can set a high value for work_mem
+        echo "POSTGRES_WORK_MEM=10MB" >> $GITHUB_ENV
+        # ZFS does a lot of caching, even on .net
+        echo "POSTGRES_EFFECTIVE_CACHE_SIZE=5G" >> $GITHUB_ENV
 
     - name: Set various variable for prod (org) deployment
       if: matrix.env == 'shared-org'
@@ -55,6 +62,12 @@ jobs:
         echo "MONGODB_EXPOSE=27017" >> $GITHUB_ENV
         echo "REDIS_EXPOSE=6379" >> $GITHUB_ENV
         echo "POSTGRES_EXPOSE=5432" >> $GITHUB_ENV
+        # Postgres resources
+        echo "POSTGRES_SHM_SIZE=1Gb" >> $GITHUB_ENV
+        echo "POSTGRES_SHARED_BUFFERS=1G" >> $GITHUB_ENV
+        echo "POSTGRES_WORK_MEM=50MB" >> $GITHUB_ENV
+        # ZFS does a lot of caching, assume a high cache size
+        echo "POSTGRES_EFFECTIVE_CACHE_SIZE=10G" >> $GITHUB_ENV
 
     - name: Checkout git repository
       uses: appleboy/ssh-action@master
@@ -124,10 +137,12 @@ jobs:
           echo "PG_BOOTSTRAP_USERNAME=bootstrap" >> .env
           echo "PG_BOOTSTRAP_PASSWORD=${{ secrets.PG_BOOTSTRAP_PASSWORD }}" >> .env
 
-          # May want to make these environment specific if we were to deploy to production
-          echo "POSTGRES_SHM_SIZE=256m" >> .env
-          echo "POSTGRES_SHARED_BUFFERS=128MB" >> .env
-          echo "POSTGRES_WORK_MEM=4MB" >> .env
+          # Postgres resources
+          echo "POSTGRES_SHM_SIZE={{ env.POSTGRES_SHM_SIZE }}" >> .env
+          echo "POSTGRES_SHARED_BUFFERS={{ env.POSTGRES_SHARED_BUFFERS }}" >> .env
+          echo "POSTGRES_WORK_MEM={{ env.POSTGRES_WORK_MEM }}" >> .env
+          # ZFS do a lot of caching
+          echo "POSTGRES_EFFECTIVE_CACHE_SIZE={{ env.POSTGRES_EFFECTIVE_CACHE_SIZE }}" >> .env
 
     - name: Create Docker volumes and networks
       uses: appleboy/ssh-action@master
