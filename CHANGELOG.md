@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.1.0](https://github.com/openfoodfacts/openfoodfacts-shared-services/compare/v1.0.0...v1.1.0) (2026-03-06)
+
+
+### Features
+
+* better ulimits for services in production ([#32](https://github.com/openfoodfacts/openfoodfacts-shared-services/issues/32)) ([cbb5ae7](https://github.com/openfoodfacts/openfoodfacts-shared-services/commit/cbb5ae780531a8dcb46da82a3659655a9788526e))
+
+
+### Bug Fixes
+
+* Add restart policy to monitoring services ([#28](https://github.com/openfoodfacts/openfoodfacts-shared-services/issues/28)) ([513b196](https://github.com/openfoodfacts/openfoodfacts-shared-services/commit/513b196e265ca95f48ad793f38e9f848104e0e8c))
+* hotfix on deploy ([492d986](https://github.com/openfoodfacts/openfoodfacts-shared-services/commit/492d9860da7c1a3f9cbdf34e6ad8ae142cc19474))
+
 ## 1.0.0 (2026-01-28)
 
 
