@@ -39,12 +39,12 @@ jobs:
         echo "REDIS_EXPOSE=127.0.0.1:6379" >> $GITHUB_ENV
         echo "POSTGRES_EXPOSE=127.0.0.1:5432" >> $GITHUB_ENV
         # Postgres resources
-        echo "POSTGRES_SHM_SIZE=256Mb" >> $GITHUB_ENV
-        echo "POSTGRES_SHARED_BUFFERS=128Mb" >> $GITHUB_ENV
+        echo "POSTGRES_SHM_SIZE=256MB" >> $GITHUB_ENV
+        echo "POSTGRES_SHARED_BUFFERS=128MB" >> $GITHUB_ENV
         # we don't have much traffic on .net, so we can set a high value for work_mem
         echo "POSTGRES_WORK_MEM=10MB" >> $GITHUB_ENV
         # ZFS does a lot of caching, even on .net
-        echo "POSTGRES_EFFECTIVE_CACHE_SIZE=5Gb" >> $GITHUB_ENV
+        echo "POSTGRES_EFFECTIVE_CACHE_SIZE=5GB" >> $GITHUB_ENV
 
     - name: Set various variable for prod (org) deployment
       if: matrix.env == 'shared-org'
@@ -63,11 +63,11 @@ jobs:
         echo "REDIS_EXPOSE=6379" >> $GITHUB_ENV
         echo "POSTGRES_EXPOSE=5432" >> $GITHUB_ENV
         # Postgres resources
-        echo "POSTGRES_SHM_SIZE=1Gb" >> $GITHUB_ENV
-        echo "POSTGRES_SHARED_BUFFERS=1G" >> $GITHUB_ENV
+        echo "POSTGRES_SHM_SIZE=1GB" >> $GITHUB_ENV
+        echo "POSTGRES_SHARED_BUFFERS=1GB" >> $GITHUB_ENV
         echo "POSTGRES_WORK_MEM=50MB" >> $GITHUB_ENV
         # ZFS does a lot of caching, assume a high cache size
-        echo "POSTGRES_EFFECTIVE_CACHE_SIZE=10Gb" >> $GITHUB_ENV
+        echo "POSTGRES_EFFECTIVE_CACHE_SIZE=10GB" >> $GITHUB_ENV
 
     - name: Checkout git repository
       uses: appleboy/ssh-action@master
