@@ -5,9 +5,8 @@ on:
     branches:
       - main
       - deploy-*
-    # We don't currently automatically deploy to production so no release tag filters needed
-    # tags:
-    #   - v*.*.*
+    tags:
+      - v*.*.*
 
 # Note on secrets used for connection
 # SSH_PRIVATE_KEY is the private key (shared between VM and host)
@@ -17,7 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        env: [shared-net]
+        env:
+          - ${{ startsWith(github.ref, 'refs/tags/v') && 'shared-org' || 'shared-net' }}
     environment: ${{ matrix.env }}
     concurrency: ${{ matrix.env }}
     steps:
@@ -26,6 +26,7 @@ jobs:
       if: matrix.env == 'shared-net'
       run: |
         # configs
+        echo "COMPOSE_PROJECT_NAME=off_shared" >> $GITHUB_ENV
         echo "MONGODB_CACHE_SIZE=14" >> $GITHUB_ENV
         echo "MONGODB_HOST=10.1.0.200" >> $GITHUB_ENV
         # deploy target
@@ -33,12 +34,40 @@ jobs:
         echo "SSH_PROXY_HOST=ovh1.openfoodfacts.org" >> $GITHUB_ENV
         echo "SSH_USERNAME=off" >> $GITHUB_ENV
         echo "COMMON_NET_NAME=po_webnet" >> $GITHUB_ENV
+        # in -net we only need to expose mongodb, as the rest ues docker common_net
+        echo "MONGODB_EXPOSE=27017" >> $GITHUB_ENV
+        echo "REDIS_EXPOSE=127.0.0.1:6379" >> $GITHUB_ENV
+        echo "POSTGRES_EXPOSE=127.0.0.1:5432" >> $GITHUB_ENV
+        # Postgres resources
+        echo "POSTGRES_SHM_SIZE=256MB" >> $GITHUB_ENV
+        echo "POSTGRES_SHARED_BUFFERS=128MB" >> $GITHUB_ENV
+        # we don't have much traffic on .net, so we can set a high value for work_mem
+        echo "POSTGRES_WORK_MEM=10MB" >> $GITHUB_ENV
+        # ZFS does a lot of caching, even on .net
+        echo "POSTGRES_EFFECTIVE_CACHE_SIZE=5GB" >> $GITHUB_ENV
 
     - name: Set various variable for prod (org) deployment
       if: matrix.env == 'shared-org'
       run: |
-        # FIXME: we do not deploy to prod currently
-        false
+        # configs
+        echo "COMPOSE_PROJECT_NAME=off_shared" >> $GITHUB_ENV
+        echo "MONGODB_CACHE_SIZE=64" >> $GITHUB_ENV
+        echo "MONGODB_HOST=10.13.1.200" >> $GITHUB_ENV
+        # deploy target
+        echo "SSH_HOST=10.13.1.200" >> $GITHUB_ENV
+        echo "SSH_PROXY_HOST=scaleway-02.infra.openfoodfacts.org" >> $GITHUB_ENV
+        echo "SSH_USERNAME=off" >> $GITHUB_ENV
+        echo "COMMON_NET_NAME=po_webnet" >> $GITHUB_ENV
+        # in -org we need to expose all services
+        echo "MONGODB_EXPOSE=27017" >> $GITHUB_ENV
+        echo "REDIS_EXPOSE=6379" >> $GITHUB_ENV
+        echo "POSTGRES_EXPOSE=5432" >> $GITHUB_ENV
+        # Postgres resources
+        echo "POSTGRES_SHM_SIZE=1GB" >> $GITHUB_ENV
+        echo "POSTGRES_SHARED_BUFFERS=1GB" >> $GITHUB_ENV
+        echo "POSTGRES_WORK_MEM=50MB" >> $GITHUB_ENV
+        # ZFS does a lot of caching, assume a high cache size
+        echo "POSTGRES_EFFECTIVE_CACHE_SIZE=10GB" >> $GITHUB_ENV
 
     - name: Checkout git repository
       uses: appleboy/ssh-action@master
@@ -83,29 +112,37 @@ jobs:
 
           echo "RESTART_POLICY=always" >> .env
 
-          # Use old po project name for now so we don't disrupt the current deployment
-          echo "COMPOSE_PROJECT_NAME=po" >> .env
+          echo "COMPOSE_PROJECT_NAME=${{ env.COMPOSE_PROJECT_NAME }}" >> .env
           echo "COMMON_NET_NAME=${{ env.COMMON_NET_NAME }}" >> .env
 
           echo "COMPOSE_PATH_SEPARATOR=;" >> .env
-          echo "COMPOSE_FILE=docker-compose.yml;docker/${{ matrix.env }}.yml" >> .env
+          echo "COMPOSE_FILE=docker-compose.yml;docker-compose-run.yml;docker/prod.yml;docker/monitor.yml" >> .env
+          echo "COMPOSE_PROFILES=all" >> .env
 
-          # Use dbdata docker volume for now to keep consistency with previous po owned deployment
-          echo "MONGODB_DATA_VOLUME=dbdata" >> .env
+          echo "MONGODB_EXPOSE=${{ env.MONGODB_EXPOSE }}" >> .env
+          echo "REDIS_EXPOSE=${{ env.REDIS_EXPOSE }}" >> .env
+          echo "POSTGRES_EXPOSE=${{ env.POSTGRES_EXPOSE }}" >> .env
+          # expose exporters on specific ports, see https://github.com/openfoodfacts/.github/blob/main/docs/ports-and-project-names.md
+          echo "MONGODB_EXPORTER_EXPOSE=5701" >> .env
+          echo "REDIS_EXPORTER_EXPOSE=5702" >> .env
+          echo "POSTGRES_EXPORTER_EXPOSE=5703" >> .env
+
           # Set App variables
           echo "MONGODB_CACHE_SIZE=${{ env.MONGODB_CACHE_SIZE }}" >> .env
           echo "MONGODB_HOST=${{ env.MONGODB_HOST }}" >> .env
 
-          echo "POSTGRES_IMAGE=pgautoupgrade/pgautoupgrade:16-alpine" >> .env
+          echo "POSTGRES_IMAGE=pgautoupgrade/pgautoupgrade:17-alpine" >> .env
           echo "POSTGRES_USER=postgres" >> .env
           echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
           echo "PG_BOOTSTRAP_USERNAME=bootstrap" >> .env
           echo "PG_BOOTSTRAP_PASSWORD=${{ secrets.PG_BOOTSTRAP_PASSWORD }}" >> .env
 
-          # May want to make these environment specific if we were to deploy to production
-          echo "POSTGRES_SHM_SIZE=256m" >> .env
-          echo "POSTGRES_SHARED_BUFFERS=128MB" >> .env
-          echo "POSTGRES_WORK_MEM=4MB" >> .env
+          # Postgres resources
+          echo "POSTGRES_SHM_SIZE=${{ env.POSTGRES_SHM_SIZE }}" >> .env
+          echo "POSTGRES_SHARED_BUFFERS=${{ env.POSTGRES_SHARED_BUFFERS }}" >> .env
+          echo "POSTGRES_WORK_MEM=${{ env.POSTGRES_WORK_MEM }}" >> .env
+          # ZFS do a lot of caching
+          echo "POSTGRES_EFFECTIVE_CACHE_SIZE=${{ env.POSTGRES_EFFECTIVE_CACHE_SIZE }}" >> .env
 
     - name: Create Docker volumes and networks
       uses: appleboy/ssh-action@master
@@ -116,14 +153,22 @@ jobs:
         proxy_host: ${{ env.SSH_PROXY_HOST }}
         proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
-        # Note again hard-coded po prefixes are used for now
         script: |
-          docker volume create dbdata \
-          || echo "dbdata volume already exists"
-          docker volume create --driver=local -o type=none -o o=bind -o device=/srv/off/docker_data/redis po_redisdata \
-          || echo "redisdata volume already exists"
-          docker volume create --driver=local -o type=none -o o=bind -o device=/srv/off/docker_data/off_shared_pg_data off_shared_pg_data \
-          || echo "off_shared_pg_data volume already exists"
+          docker volume create ${{ env.COMPOSE_PROJECT_NAME }}_mongodb_data \
+          || echo "${{ env.COMPOSE_PROJECT_NAME }}_mongodb_data volume already exists"
+          if [ "${{ matrix.env }}" == "shared-org" ]
+          then
+            docker volume create ${{ env.COMPOSE_PROJECT_NAME }}_redisdata \
+            || echo "${{ env.COMPOSE_PROJECT_NAME }}_redis_data volume already exists"
+            docker volume create ${{ env.COMPOSE_PROJECT_NAME }}_pg_data \
+            || echo "${{ env.COMPOSE_PROJECT_NAME }}_pg_data volume already exists"
+          else
+            # on staging we have part of docker data on a specific disk and location
+            docker volume create --driver=local -o type=none -o o=bind -o device=/srv/off/docker_data/${{ env.COMPOSE_PROJECT_NAME }}_redisdata ${{ env.COMPOSE_PROJECT_NAME }}_redisdata \
+            || echo "${{ env.COMPOSE_PROJECT_NAME }}_redisdata volume already exists"
+            docker volume create --driver=local -o type=none -o o=bind -o device=/srv/off/docker_data/${{ env.COMPOSE_PROJECT_NAME }}_pg_data ${{ env.COMPOSE_PROJECT_NAME }}_pg_data \
+            || echo "${{ env.COMPOSE_PROJECT_NAME }}_pg_data volume already exists"
+          fi
 
     - name: Start services
       uses: appleboy/ssh-action@master
@@ -137,7 +182,8 @@ jobs:
         command_timeout: 15m
         script: |
           cd ${{ matrix.env }}
-          make run
+
+          make up
 
     - name: Check services are up
       uses: appleboy/ssh-action@master

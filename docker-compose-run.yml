@@ -7,6 +7,9 @@ services:
       - redisdata:/data
     networks:
       - common_net
+    profiles:
+      - all
+      - redis
 
   mongodb:
     ports:
@@ -16,10 +19,19 @@ services:
       - ./import:/import
     networks:
       - common_net
+    profiles:
+      - all
+      - mongodb
 
   postgresql:
     image: ${POSTGRES_IMAGE}
-    command: postgres -c shared_buffers=${POSTGRES_SHARED_BUFFERS} -c work_mem=${POSTGRES_WORK_MEM} -c listen_addresses='*'
+    command: [
+      "postgres",
+      "-c", "shared_buffers=${POSTGRES_SHARED_BUFFERS}",
+      "-c", "work_mem=${POSTGRES_WORK_MEM}",
+      "-c", "effective_cache_size=${POSTGRES_EFFECTIVE_CACHE_SIZE}",
+      "-c", "listen_addresses=*"
+    ]
     restart: ${RESTART_POLICY:-always}
     environment:
       - POSTGRES_USER
@@ -28,15 +40,20 @@ services:
     shm_size: ${POSTGRES_SHM_SIZE}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
-      interval: 1s
+      interval: 10s
       timeout: 5s
-      retries: 25
+      start_interval: 1s
+      start_period: 60s
+      retries: 2
     ports:
       - "${POSTGRES_EXPOSE:-127.0.0.1:5432}:5432"
     volumes:
       - pg_data:/var/lib/postgresql/data
     networks:
       - common_net
+    profiles:
+      - all
+      - postgresql
 
   # Note this is only used for local development. In production,
   # central monitoring platform is used to collect metrics

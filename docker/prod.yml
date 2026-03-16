@@ -1,0 +1,33 @@
+x-services-ulimits: &services-ulimits
+  nofile: 128000
+  # 512M
+  stack: 536870912
+
+
+services:
+  mongodb:
+    ulimits: *services-ulimits
+
+  redis:
+    ulimits: *services-ulimits
+ 
+  postgresql:
+    ulimits: *services-ulimits
+
+volumes:
+  redisdata:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME}_redisdata
+
+  dbdata:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME}_mongodb_data
+
+  pg_data:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME}_pg_data
+
+networks:
+  common_net:
+    external: true
+    name: ${COMMON_NET_NAME}

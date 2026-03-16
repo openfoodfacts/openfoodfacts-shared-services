@@ -3,10 +3,13 @@ include .env
 
 export
 
-run: create_external_networks
+up: create_external_networks
 # Make sure the import directory is owned by the host, not docker
 	@mkdir -p ./import
 	docker compose up --wait
+
+# We have no dependencies and no locally build images so run == up
+run: up
 
 stop: 
 	docker compose stop
