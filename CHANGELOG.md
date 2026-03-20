@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/openfoodfacts/openfoodfacts-shared-services/compare/v1.1.0...v1.2.0) (2026-03-20)
+
+
+### Features
+
+* Support OpenTelemetry ([#5](https://github.com/openfoodfacts/openfoodfacts-shared-services/issues/5)) ([8ca67ad](https://github.com/openfoodfacts/openfoodfacts-shared-services/commit/8ca67ad106f7379cd9c415c2d6f125b63c201f1c))
+
 ## [1.1.0](https://github.com/openfoodfacts/openfoodfacts-shared-services/compare/v1.0.0...v1.1.0) (2026-03-06)
 
 
