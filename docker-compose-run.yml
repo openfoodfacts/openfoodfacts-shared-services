@@ -30,7 +30,8 @@ services:
       "-c", "shared_buffers=${POSTGRES_SHARED_BUFFERS}",
       "-c", "work_mem=${POSTGRES_WORK_MEM}",
       "-c", "effective_cache_size=${POSTGRES_EFFECTIVE_CACHE_SIZE}",
-      "-c", "listen_addresses=*"
+      "-c", "listen_addresses=*",
+      "-c", "config_file=/etc/postgresql.conf"
     ]
     restart: ${RESTART_POLICY:-always}
     environment:
@@ -49,6 +50,8 @@ services:
       - "${POSTGRES_EXPOSE:-127.0.0.1:5432}:5432"
     volumes:
       - pg_data:/var/lib/postgresql/data
+      # mounting configuration file
+      - ${POSTGRES_CONFIG_FILE}:/etc/postgresql.conf
     networks:
       - common_net
     profiles:
