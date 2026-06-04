@@ -143,7 +143,7 @@ jobs:
           echo "POSTGRES_WORK_MEM=${{ env.POSTGRES_WORK_MEM }}" >> .env
           # ZFS do a lot of caching
           echo "POSTGRES_EFFECTIVE_CACHE_SIZE=${{ env.POSTGRES_EFFECTIVE_CACHE_SIZE }}" >> .env
-          echo "POSTGRES_CONFIG_FILE=./confs/postgresql/base.conf" >> .env
+          echo "POSTGRES_CONFIG_FILE=./postgresql.conf" >> .env
 
     - name: Create Docker volumes and networks
       uses: appleboy/ssh-action@master
