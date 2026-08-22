@@ -1,5 +1,22 @@
 # Changelog
 
+## [2.0.0](https://github.com/openfoodfacts/openfoodfacts-shared-services/compare/v1.1.0...v2.0.0) (2026-08-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* Temporarily remove OpenTelemetry support ([#37](https://github.com/openfoodfacts/openfoodfacts-shared-services/issues/37))
+
+### Features
+
+* Support OpenTelemetry ([#5](https://github.com/openfoodfacts/openfoodfacts-shared-services/issues/5)) ([8ca67ad](https://github.com/openfoodfacts/openfoodfacts-shared-services/commit/8ca67ad106f7379cd9c415c2d6f125b63c201f1c))
+* Temporarily remove OpenTelemetry support ([#37](https://github.com/openfoodfacts/openfoodfacts-shared-services/issues/37)) ([461304c](https://github.com/openfoodfacts/openfoodfacts-shared-services/commit/461304c8385e8892b6565f0af1cf97c29ae3e96a))
+
+
+### Bug Fixes
+
+* PostgreSQL configuration file needs to be in the root directory ([#39](https://github.com/openfoodfacts/openfoodfacts-shared-services/issues/39)) ([8ae1b05](https://github.com/openfoodfacts/openfoodfacts-shared-services/commit/8ae1b0572fbbd11f595ab3291cf06ca65c320644))
+
 ## [1.1.0](https://github.com/openfoodfacts/openfoodfacts-shared-services/compare/v1.0.0...v1.1.0) (2026-03-06)
 
 
