@@ -15,8 +15,8 @@ stop:
 	docker compose stop
 
 import_prod_data: run
-	@echo "🥫 Importing production data (~2M products) into MongoDB …"
-	@echo "🥫 This might take up to 10 mn, so feel free to grab a coffee!"
+	@echo "🥫 Importing production data (~4M products) into MongoDB …"
+	@echo "🥫 This might take few hours, so feel free to watch a film or a few TV episodes!"
 	@echo "🥫 Removing old archive in case you have one"
 	@( rm -f ./import/openfoodfacts-mongodbdump.gz || true ) && ( rm -f ./import/gz-sha256sum || true )
 	@echo "🥫 Downloading full MongoDB dump from production …"
