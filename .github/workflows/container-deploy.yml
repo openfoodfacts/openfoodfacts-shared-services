@@ -1,5 +1,8 @@
 name: Container Image Deployment CI
 
+permissions:
+  contents: read
+
 on:
   push:
     branches:
