@@ -6,6 +6,9 @@ on:
   push:
     branches: ["cron-*"]
 
+permissions:
+  contents: read
+
 jobs:
   # TODO: Uncomment when prod environment is ready
   # prod-db-backup:
