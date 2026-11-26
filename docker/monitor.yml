@@ -2,7 +2,16 @@
 services:
   mongodb_exporter:
     image: bitnami/mongodb-exporter:latest
-    command: --discovering-mode --mongodb.uri=mongodb://mongodb:27017/admin?ssl=false
+    command:
+      - "--discovering-mode" 
+      - "--mongodb.uri=mongodb://mongodb:27017/admin?ssl=false"
+      - "--mongodb.collstats-colls=obf.products,obf.products_obsolete,opf.products,opf.products_obsolete,opff.products,opff.products_obsolete,off.products,off.products_obsolete"
+      - "--mongodb.indexstats-colls=obf.products,obf.products_obsolete,opf.products,opf.products_obsolete,opff.products,opff.products_obsolete,off.products,off.products_obsolete"
+      - "--collector.dbstats"
+      - "--collector.dbstatsfreestorage"
+      - "--collector.indexstats"
+      - "--collector.collstats"
+      - "--collector.topmetrics"
     restart: ${RESTART_POLICY:-always}
     ports:
       - ${MONGODB_EXPORTER_EXPOSE:-127.0.0.1:5701}:9216
